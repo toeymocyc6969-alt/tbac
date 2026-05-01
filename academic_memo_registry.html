@@ -1,0 +1,545 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Charm:wght@400;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--brand:#1a3a5c;--brand2:#2e6da4;--accent:#c8943a;--light:#f0f5fb;--border:rgba(46,109,164,0.18)}
+  body{font-family:'Sarabun',sans-serif;font-size:14px;color:var(--color-text-primary)}
+  .app{display:flex;flex-direction:column;min-height:600px}
+  .header{background:var(--brand);color:#fff;padding:0}
+  .header-top{background:linear-gradient(135deg,#1a3a5c 0%,#2e6da4 100%);padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--accent)}
+  .header-logo{width:54px;height:54px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--accent)}
+  .header-logo svg{width:32px;height:32px}
+  .header-title h1{font-family:'Charm',serif;font-size:17px;font-weight:700;color:#fff;line-height:1.3}
+  .header-title p{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px}
+  .header-sub{background:#16334f;padding:8px 20px;display:flex;gap:6px}
+  .tab-btn{background:transparent;border:none;color:rgba(255,255,255,0.65);font-family:'Sarabun',sans-serif;font-size:13px;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all .2s}
+  .tab-btn.active{background:var(--accent);color:#fff;font-weight:500}
+  .tab-btn:hover:not(.active){background:rgba(255,255,255,0.1);color:#fff}
+  .content{flex:1;padding:16px 20px;background:var(--color-background-tertiary)}
+  .section{display:none}.section.active{display:block}
+  .card{background:var(--color-background-primary);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .card-title{font-size:14px;font-weight:600;color:var(--brand);display:flex;align-items:center;gap:8px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-group{display:flex;flex-direction:column;gap:4px}
+  .form-group.full{grid-column:1/-1}
+  label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+  input,select,textarea{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:6px;font-family:'Sarabun',sans-serif;font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);transition:border-color .2s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand2)}
+  textarea{resize:vertical;min-height:70px}
+  .btn{padding:8px 18px;border-radius:6px;border:none;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+  .btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand2)}
+  .btn-secondary{background:transparent;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary)}.btn-secondary:hover{background:var(--color-background-secondary)}
+  .btn-success{background:#2e7d32;color:#fff}.btn-success:hover{background:#388e3c}
+  .btn-danger{background:transparent;border:0.5px solid #c62828;color:#c62828;font-size:12px;padding:4px 10px}.btn-danger:hover{background:#ffebee}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .stat-card{background:var(--color-background-primary);border:0.5px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+  .stat-num{font-size:26px;font-weight:600;color:var(--brand2);line-height:1}
+  .stat-label{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead tr{background:var(--light)}
+  th{padding:9px 10px;text-align:left;font-weight:600;font-size:12px;color:var(--brand);border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle}
+  tr:hover td{background:var(--color-background-secondary)}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+  .badge-in{background:#e3f2fd;color:#1565c0}
+  .badge-out{background:#fff3e0;color:#e65100}
+  .badge-new{background:#e8f5e9;color:#2e7d32}
+  .search-bar{display:flex;gap:8px;margin-bottom:12px}
+  .search-bar input{flex:1}
+  .no-data{text-align:center;color:var(--color-text-secondary);padding:32px;font-size:13px}
+  .filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .filter-row select{width:auto;min-width:120px}
+  .print-btn{background:var(--accent);color:#fff;border:none;padding:6px 12px;border-radius:5px;font-family:'Sarabun',sans-serif;font-size:12px;cursor:pointer}
+  .serial-num{color:var(--brand2);font-weight:600;font-size:12px}
+  .actions-row{display:flex;gap:6px;justify-content:flex-end;margin-top:14px}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--color-background-primary);border-radius:10px;padding:20px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);line-height:1}
+</style>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="6" width="24" height="20" rx="2" fill="#1a3a5c"/>
+          <rect x="4" y="6" width="24" height="20" rx="2" stroke="#c8943a" stroke-width="1.5"/>
+          <rect x="8" y="10" width="16" height="2" rx="1" fill="#c8943a"/>
+          <rect x="8" y="14" width="12" height="1.5" rx="0.75" fill="rgba(255,255,255,0.7)"/>
+          <rect x="8" y="17" width="14" height="1.5" rx="0.75" fill="rgba(255,255,255,0.7)"/>
+          <rect x="8" y="20" width="10" height="1.5" rx="0.75" fill="rgba(255,255,255,0.7)"/>
+        </svg>
+      </div>
+      <div class="header-title">
+        <h1>ทะเบียนบันทึกข้อความ ฝ่ายวิชาการ</h1>
+        <p>วิทยาลัยเทคโนโลยีบริหารธุรกิจอุดรธานี</p>
+      </div>
+    </div>
+    <div class="header-sub">
+      <button class="tab-btn active" onclick="switchTab('dashboard')">หน้าหลัก</button>
+      <button class="tab-btn" onclick="switchTab('new')">บันทึกข้อความใหม่</button>
+      <button class="tab-btn" onclick="switchTab('list')">ทะเบียนข้อความ</button>
+      <button class="tab-btn" onclick="switchTab('report')">รายงาน</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Dashboard -->
+    <div id="section-dashboard" class="section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">ข้อความทั้งหมด</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-in" style="color:#1565c0">0</div>
+          <div class="stat-label">บันทึกรับ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-out" style="color:#e65100">0</div>
+          <div class="stat-label">บันทึกส่ง</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-today" style="color:#2e7d32">0</div>
+          <div class="stat-label">วันนี้</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5 5h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            ข้อความล่าสุด 5 รายการ
+          </div>
+          <button class="btn btn-secondary" style="font-size:12px;padding:4px 12px" onclick="switchTab('list')">ดูทั้งหมด</button>
+        </div>
+        <div id="recent-list"><div class="no-data">ยังไม่มีข้อมูล</div></div>
+      </div>
+    </div>
+
+    <!-- New Memo -->
+    <div id="section-new" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13V10L10 3l3 3-7 7H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8.5 4.5l3 3" stroke="currentColor" stroke-width="1.4"/></svg>
+            <span id="form-title">บันทึกข้อความใหม่</span>
+          </div>
+          <div id="memo-number-display" style="font-size:12px;color:var(--brand2);font-weight:600"></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>ประเภทบันทึก *</label>
+            <select id="memo-type">
+              <option value="in">บันทึกรับ (เข้า)</option>
+              <option value="out">บันทึกส่ง (ออก)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>วันที่บันทึก *</label>
+            <input type="date" id="memo-date">
+          </div>
+          <div class="form-group">
+            <label>เลขที่หนังสือ</label>
+            <input type="text" id="memo-docno" placeholder="เช่น วท.อด. 001/2568">
+          </div>
+          <div class="form-group">
+            <label>ลำดับที่รับ/ส่ง</label>
+            <input type="text" id="memo-serial" placeholder="ระบบกำหนดอัตโนมัติ" readonly style="background:var(--color-background-secondary)">
+          </div>
+          <div class="form-group full">
+            <label>เรื่อง *</label>
+            <input type="text" id="memo-subject" placeholder="ระบุเรื่องของบันทึกข้อความ">
+          </div>
+          <div class="form-group">
+            <label>จาก / ถึง *</label>
+            <input type="text" id="memo-from" placeholder="หน่วยงาน / ชื่อบุคคล">
+          </div>
+          <div class="form-group">
+            <label>ฝ่าย / แผนก</label>
+            <select id="memo-dept">
+              <option value="">-- เลือกฝ่าย --</option>
+              <option value="วิชาการ">ฝ่ายวิชาการ</option>
+              <option value="ทะเบียน">ฝ่ายทะเบียน</option>
+              <option value="บุคลากร">ฝ่ายบุคลากร</option>
+              <option value="การเงิน">ฝ่ายการเงิน</option>
+              <option value="กิจการนักศึกษา">ฝ่ายกิจการนักศึกษา</option>
+              <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ผู้รับ / ผู้ส่ง</label>
+            <input type="text" id="memo-handler" placeholder="ชื่อผู้รับผิดชอบ">
+          </div>
+          <div class="form-group">
+            <label>ระดับความเร่งด่วน</label>
+            <select id="memo-urgent">
+              <option value="ปกติ">ปกติ</option>
+              <option value="ด่วน">ด่วน</option>
+              <option value="ด่วนมาก">ด่วนมาก</option>
+              <option value="ด่วนที่สุด">ด่วนที่สุด</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>รายละเอียด / หมายเหตุ</label>
+            <textarea id="memo-note" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+          </div>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-secondary" onclick="clearForm()">ล้างข้อมูล</button>
+          <button class="btn btn-primary" onclick="saveMemo()">บันทึกข้อความ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="section-list" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h8M3 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            ทะเบียนข้อความทั้งหมด
+          </div>
+          <button class="print-btn" onclick="exportCSV()">ส่งออก CSV</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="ค้นหาเรื่อง / เลขที่หนังสือ / หน่วยงาน..." oninput="renderList()">
+          <div class="filter-row" style="margin:0;gap:6px">
+            <select id="filter-type" onchange="renderList()">
+              <option value="">ประเภท: ทั้งหมด</option>
+              <option value="in">บันทึกรับ</option>
+              <option value="out">บันทึกส่ง</option>
+            </select>
+            <select id="filter-dept" onchange="renderList()">
+              <option value="">ฝ่าย: ทั้งหมด</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>ลำดับ</th><th>วันที่</th><th>ประเภท</th><th>เลขที่หนังสือ</th><th>เรื่อง</th><th>จาก/ถึง</th><th>ความเร่งด่วน</th><th>จัดการ</th>
+            </tr></thead>
+            <tbody id="memo-tbody"></tbody>
+          </table>
+        </div>
+        <div id="list-empty" class="no-data" style="display:none">ไม่พบข้อมูล</div>
+      </div>
+    </div>
+
+    <!-- Report -->
+    <div id="section-report" class="section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num" id="rep-total">0</div>
+          <div class="stat-label">ทั้งหมด</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="rep-in" style="color:#1565c0">0</div>
+          <div class="stat-label">บันทึกรับ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="rep-out" style="color:#e65100">0</div>
+          <div class="stat-label">บันทึกส่ง</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="rep-month" style="color:#6a1b9a">0</div>
+          <div class="stat-label">เดือนนี้</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">สรุปตามฝ่าย</div>
+        </div>
+        <div id="dept-report"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">สรุปตามระดับความเร่งด่วน</div>
+        </div>
+        <div id="urgent-report"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal-overlay" id="view-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="card-title" id="modal-type-badge">รายละเอียดบันทึกข้อความ</div>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+let memos = [];
+let editId = null;
+
+function today(){
+  const d=new Date();
+  return d.toISOString().split('T')[0];
+}
+
+function thaiDate(iso){
+  if(!iso)return'-';
+  const [y,m,d]=iso.split('-');
+  const months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${parseInt(y)+543}`;
+}
+
+function initDate(){
+  document.getElementById('memo-date').value = today();
+}
+
+function genSerial(type){
+  const year=new Date().getFullYear()+543;
+  const count=memos.filter(m=>m.type===type).length+1;
+  const prefix=type==='in'?'รบ':'สง';
+  return `${prefix}-${year}-${String(count).padStart(3,'0')}`;
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('section-'+tab).classList.add('active');
+  const idx=['dashboard','new','list','report'].indexOf(tab);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if(tab==='dashboard') updateDashboard();
+  if(tab==='list') renderList();
+  if(tab==='report') renderReport();
+  if(tab==='new' && !editId){
+    clearForm();
+    const serial=genSerial(document.getElementById('memo-type').value);
+    document.getElementById('memo-serial').value=serial;
+    document.getElementById('memo-number-display').textContent='เลขลำดับ: '+serial;
+  }
+}
+
+document.getElementById('memo-type').addEventListener('change',function(){
+  if(!editId){
+    const serial=genSerial(this.value);
+    document.getElementById('memo-serial').value=serial;
+    document.getElementById('memo-number-display').textContent='เลขลำดับ: '+serial;
+  }
+});
+
+function clearForm(){
+  editId=null;
+  document.getElementById('form-title').textContent='บันทึกข้อความใหม่';
+  document.getElementById('memo-type').value='in';
+  document.getElementById('memo-date').value=today();
+  document.getElementById('memo-docno').value='';
+  document.getElementById('memo-subject').value='';
+  document.getElementById('memo-from').value='';
+  document.getElementById('memo-dept').value='';
+  document.getElementById('memo-handler').value='';
+  document.getElementById('memo-urgent').value='ปกติ';
+  document.getElementById('memo-note').value='';
+  const serial=genSerial('in');
+  document.getElementById('memo-serial').value=serial;
+  document.getElementById('memo-number-display').textContent='เลขลำดับ: '+serial;
+}
+
+function saveMemo(){
+  const type=document.getElementById('memo-type').value;
+  const date=document.getElementById('memo-date').value;
+  const subject=document.getElementById('memo-subject').value.trim();
+  const from=document.getElementById('memo-from').value.trim();
+  if(!date||!subject||!from){alert('กรุณากรอกข้อมูลที่จำเป็น (วันที่, เรื่อง, จาก/ถึง)');return;}
+  const memo={
+    id: editId || Date.now(),
+    type, date,
+    serial: editId ? memos.find(m=>m.id===editId).serial : genSerial(type),
+    docno: document.getElementById('memo-docno').value.trim(),
+    subject,
+    from,
+    dept: document.getElementById('memo-dept').value,
+    handler: document.getElementById('memo-handler').value.trim(),
+    urgent: document.getElementById('memo-urgent').value,
+    note: document.getElementById('memo-note').value.trim(),
+    createdAt: today()
+  };
+  if(editId){
+    const idx=memos.findIndex(m=>m.id===editId);
+    memos[idx]=memo;
+    editId=null;
+  } else {
+    memos.push(memo);
+  }
+  clearForm();
+  updateDashboard();
+  renderFilterDepts();
+  switchTab('list');
+}
+
+function updateDashboard(){
+  const tot=memos.length;
+  const inC=memos.filter(m=>m.type==='in').length;
+  const outC=memos.filter(m=>m.type==='out').length;
+  const todC=memos.filter(m=>m.createdAt===today()).length;
+  document.getElementById('stat-total').textContent=tot;
+  document.getElementById('stat-in').textContent=inC;
+  document.getElementById('stat-out').textContent=outC;
+  document.getElementById('stat-today').textContent=todC;
+  const recent=memos.slice(-5).reverse();
+  const div=document.getElementById('recent-list');
+  if(!recent.length){div.innerHTML='<div class="no-data">ยังไม่มีข้อมูล</div>';return;}
+  div.innerHTML=`<table><thead><tr><th>วันที่</th><th>ประเภท</th><th>เรื่อง</th><th>จาก/ถึง</th></tr></thead><tbody>`+
+    recent.map(m=>`<tr>
+      <td>${thaiDate(m.date)}</td>
+      <td><span class="badge ${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'รับ':'ส่ง'}</span></td>
+      <td>${m.subject}</td><td>${m.from}</td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+function renderFilterDepts(){
+  const sel=document.getElementById('filter-dept');
+  const depts=[...new Set(memos.map(m=>m.dept).filter(Boolean))];
+  const cur=sel.value;
+  sel.innerHTML='<option value="">ฝ่าย: ทั้งหมด</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+  if(cur) sel.value=cur;
+}
+
+function renderList(){
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const ft=document.getElementById('filter-type').value;
+  const fd=document.getElementById('filter-dept').value;
+  let filtered=memos.filter(m=>{
+    const match=!q||(m.subject.toLowerCase().includes(q)||m.from.toLowerCase().includes(q)||(m.docno||'').toLowerCase().includes(q));
+    const typeOk=!ft||m.type===ft;
+    const deptOk=!fd||m.dept===fd;
+    return match&&typeOk&&deptOk;
+  });
+  const tbody=document.getElementById('memo-tbody');
+  const empty=document.getElementById('list-empty');
+  if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=filtered.slice().reverse().map((m,i)=>`<tr>
+    <td class="serial-num">${m.serial}</td>
+    <td style="font-size:12px">${thaiDate(m.date)}</td>
+    <td><span class="badge ${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'รับ':'ส่ง'}</span></td>
+    <td style="font-size:12px">${m.docno||'-'}</td>
+    <td>${m.subject}</td>
+    <td style="font-size:12px">${m.from}</td>
+    <td><span class="badge ${m.urgent==='ปกติ'?'badge-new':m.urgent==='ด่วน'?'badge-in':'badge-out'}" style="font-size:10px">${m.urgent}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;margin-right:3px" onclick="viewMemo(${m.id})">ดู</button>
+      <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;margin-right:3px" onclick="editMemo(${m.id})">แก้ไข</button>
+      <button class="btn btn-danger" onclick="deleteMemo(${m.id})">ลบ</button>
+    </td>
+  </tr>`).join('');
+}
+
+function viewMemo(id){
+  const m=memos.find(m=>m.id===id);
+  if(!m)return;
+  document.getElementById('modal-type-badge').innerHTML=`<span class="badge ${m.type==='in'?'badge-in':'badge-out'}" style="font-size:13px;padding:4px 12px">${m.type==='in'?'บันทึกรับ':'บันทึกส่ง'}</span>`;
+  document.getElementById('modal-content').innerHTML=`
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      ${[['เลขลำดับ',m.serial],['เลขที่หนังสือ',m.docno||'-'],['วันที่',thaiDate(m.date)],['เรื่อง',m.subject],['จาก/ถึง',m.from],['ฝ่าย',m.dept||'-'],['ผู้รับผิดชอบ',m.handler||'-'],['ความเร่งด่วน',m.urgent],['หมายเหตุ',m.note||'-']]
+        .map(([l,v])=>`<tr><td style="color:var(--color-text-secondary);padding:7px 0;width:35%;border-bottom:0.5px solid var(--color-border-tertiary)">${l}</td><td style="padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:${l==='เรื่อง'?'500':'400'}">${v}</td></tr>`).join('')}
+    </table>`;
+  document.getElementById('view-modal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('view-modal').classList.remove('open');
+}
+
+function editMemo(id){
+  const m=memos.find(m=>m.id===id);
+  if(!m)return;
+  editId=id;
+  document.getElementById('form-title').textContent='แก้ไขบันทึกข้อความ';
+  document.getElementById('memo-type').value=m.type;
+  document.getElementById('memo-date').value=m.date;
+  document.getElementById('memo-docno').value=m.docno||'';
+  document.getElementById('memo-serial').value=m.serial;
+  document.getElementById('memo-number-display').textContent='เลขลำดับ: '+m.serial;
+  document.getElementById('memo-subject').value=m.subject;
+  document.getElementById('memo-from').value=m.from;
+  document.getElementById('memo-dept').value=m.dept||'';
+  document.getElementById('memo-handler').value=m.handler||'';
+  document.getElementById('memo-urgent').value=m.urgent;
+  document.getElementById('memo-note').value=m.note||'';
+  switchTab('new');
+}
+
+function deleteMemo(id){
+  if(!confirm('ยืนยันการลบบันทึกข้อความนี้?'))return;
+  memos=memos.filter(m=>m.id!==id);
+  renderList();
+  updateDashboard();
+}
+
+function renderReport(){
+  const tot=memos.length;
+  const inC=memos.filter(m=>m.type==='in').length;
+  const outC=memos.filter(m=>m.type==='out').length;
+  const curMonth=today().substring(0,7);
+  const monthC=memos.filter(m=>m.date.startsWith(curMonth)).length;
+  document.getElementById('rep-total').textContent=tot;
+  document.getElementById('rep-in').textContent=inC;
+  document.getElementById('rep-out').textContent=outC;
+  document.getElementById('rep-month').textContent=monthC;
+
+  const depts={};
+  memos.forEach(m=>{const d=m.dept||'ไม่ระบุ';depts[d]=(depts[d]||0)+1;});
+  const deptDiv=document.getElementById('dept-report');
+  if(!Object.keys(depts).length){deptDiv.innerHTML='<div class="no-data">ไม่มีข้อมูล</div>';} 
+  else{
+    const maxD=Math.max(...Object.values(depts));
+    deptDiv.innerHTML=Object.entries(depts).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:110px;font-size:13px;color:var(--color-text-secondary)">${d}</div>
+        <div style="flex:1;background:var(--color-background-secondary);border-radius:4px;height:20px;overflow:hidden">
+          <div style="height:100%;background:var(--brand2);width:${Math.round(c/maxD*100)}%;border-radius:4px;transition:width .3s"></div>
+        </div>
+        <div style="width:30px;text-align:right;font-size:13px;font-weight:500">${c}</div>
+      </div>`).join('');
+  }
+
+  const urgents={};
+  memos.forEach(m=>{urgents[m.urgent]=(urgents[m.urgent]||0)+1;});
+  const urgDiv=document.getElementById('urgent-report');
+  if(!Object.keys(urgents).length){urgDiv.innerHTML='<div class="no-data">ไม่มีข้อมูล</div>';}
+  else{
+    const colors={'ปกติ':'#2e7d32','ด่วน':'#1565c0','ด่วนมาก':'#e65100','ด่วนที่สุด':'#c62828'};
+    const maxU=Math.max(...Object.values(urgents));
+    urgDiv.innerHTML=Object.entries(urgents).map(([u,c])=>`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:90px;font-size:13px;color:var(--color-text-secondary)">${u}</div>
+        <div style="flex:1;background:var(--color-background-secondary);border-radius:4px;height:20px;overflow:hidden">
+          <div style="height:100%;background:${colors[u]||'#888'};width:${Math.round(c/maxU*100)}%;border-radius:4px"></div>
+        </div>
+        <div style="width:30px;text-align:right;font-size:13px;font-weight:500">${c}</div>
+      </div>`).join('');
+  }
+}
+
+function exportCSV(){
+  if(!memos.length){alert('ไม่มีข้อมูลสำหรับส่งออก');return;}
+  const headers=['เลขลำดับ','ประเภท','วันที่','เลขที่หนังสือ','เรื่อง','จาก/ถึง','ฝ่าย','ผู้รับผิดชอบ','ความเร่งด่วน','หมายเหตุ'];
+  const rows=memos.map(m=>[m.serial,m.type==='in'?'รับ':'ส่ง',thaiDate(m.date),m.docno||'',m.subject,m.from,m.dept||'',m.handler||'',m.urgent,m.note||''].map(v=>`"${v}"`).join(','));
+  const csv='\uFEFF'+[headers.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='memo_register_'+today()+'.csv';
+  a.click();
+}
+
+document.getElementById('view-modal').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+
+initDate();
+updateDashboard();
+</script>
